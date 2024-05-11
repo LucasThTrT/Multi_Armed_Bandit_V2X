@@ -6,7 +6,7 @@ class Scenario:
         self.distance = distance                    # Distance between the transmitter and the receiver in meters
         self.traffic_density = traffic_density      # Traffic density in the area in percentage
         self.network_coverage = network_coverage    # Network coverage in the area in percentage
-        self.run()                                 # Run the simulation
+        #self.run()                                 # Run the simulation
 
     def run(self):
         # Simulation of V2V communication
