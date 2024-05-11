@@ -28,11 +28,14 @@ class V2V(Scenario):
 
 
         # 1 + Number of vehicles between V2V (distance / (space between vehicles + mean vehicle length)) * traffic density
-        self.number_of_vehicles = 1 + self.distance // ((self.minimal_space_between_vehicles + self.vehicle_length) * self.traffic_density) 
-        
-        # Estimation of the space between vehicles
-        self.space_between_vehicles = (self.distance / self.number_of_vehicles) - self.number_of_vehicles * (self.vehicle_length + self.minimal_space_between_vehicles)
+        self.number_of_vehicles = int(1 + (self.distance // ((self.minimal_space_between_vehicles + self.vehicle_length)) * self.traffic_density))
+        print("Number of vehicles: ", self.number_of_vehicles)
 
+        # Estimation of the space between vehicles
+        self.space_between_vehicles = (self.distance - (self.number_of_vehicles * (self.vehicle_length + self.minimal_space_between_vehicles))) / self.number_of_vehicles
+        print("Space between vehicles: ", self.space_between_vehicles)
+
+        print("Place prise par les véhicules: ", self.number_of_vehicles * (self.vehicle_length + self.space_between_vehicles))
         self.run()
 
 
@@ -98,7 +101,7 @@ class V2V(Scenario):
     # Simulation of V2V communication
     def V2V_simulation(self):
         transmission_validated = False
-        best_V2V_simulation = [False, 60000, 0,"methode"] # [transmission_validated, time_delay = 10min, packet_lost]
+        best_V2V_simulation = [False, 600000, 0,"methode"] # [transmission_validated, time_delay = 10min, packet_lost]
         # Simululate V2V communication for each possibility
         # We will try to communicate with each vehicle between the transmitter and the receiver
         number_of_vehicles = self.number_of_vehicles
@@ -140,5 +143,8 @@ class V2V(Scenario):
             
 
 # Test
-V2V_simulation = V2V(100, 0.5)
-print(V2V_simulation.number_of_vehicles)
+V2V_simulation_0 = V2V(100, 0.5)
+print("#####################@")
+V2V_simulation_1 = V2V(100, 0.8)
+print("#####################@")
+V2V_simulation_2 = V2V(1000, 1)
