@@ -1,7 +1,7 @@
 # Projet MAB
 
 # Simulation V2X
-    Ce code va simuler l'envoi d'alertes entre un Véhicule (V) et un utilisateur en danger (X) dans des conditions différentes.
+Ce code va simuler l'envoi d'alertes entre un Véhicule (V) et un utilisateur en danger (X) dans des conditions différentes.
 
 La communication va se faire de 2 manières différentes :
     - V2V : L'alerte est envoyée par la voie hertzienne directement entre le Véhicule et l'utilisateur Vulenerable (V).
