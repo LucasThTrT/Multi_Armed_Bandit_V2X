@@ -1,3 +1,5 @@
+# PAS UTILISE POUR LE MOMENT
+
 # This class is used to define the context of the simulation
 
 
@@ -6,12 +8,13 @@ class Scenario:
         self.distance = distance                    # Distance between the transmitter and the receiver in meters
         self.traffic_density = traffic_density      # Traffic density in the area in percentage
         self.network_coverage = network_coverage    # Network coverage in the area in percentage
-        #self.run()                                 # Run the simulation
+        self.run()                                 # Run the simulation
 
     def run(self):
         # Simulation of V2V communication
         from V2V import V2V
         V2V_simulation = V2V(self.distance, self.traffic_density)
+        print("V2V_simulation: ", V2V_simulation)
 
 
 # This class is used to define the scenario of the simulation
