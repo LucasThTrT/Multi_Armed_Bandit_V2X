@@ -9,7 +9,7 @@ Pas_distance = 200
 
 
 def calculate_latency_V2I(i):
-    return 0.064*(10**-9) * i * Pas_distance
+    return 0.064*(10,5**-6) * i * Pas_distance
 
 # Simulation of V2V communication
 #V2V(distance, traffic_density)
@@ -18,7 +18,7 @@ for i in range(1, 13):
     print("Distance: ", Pas_distance * i)
     print("Traffic density: ", 0.05)
     print("V2V_simulation: ", V2V_simulation.best_transmission)
-    print("final latency: ", V2V_simulation.best_transmission[1])
+    print("final latency: ", V2V_simulation.best_transmission)
     print("----------------------")
     print("V2I_simulation: ")
     print("final latency ", calculate_latency_V2I(i))
