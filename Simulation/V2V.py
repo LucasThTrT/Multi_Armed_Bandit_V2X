@@ -14,11 +14,22 @@ class V2V:
         self.traffic_density = traffic_density                                                              # Traffic density in the area in percentage
 
         # To Define
-        self.max_range = 1000                                                                               # Max propagation Range in meters                      (TO DEFINE !!!!)
-        self.communication_success_rate_distance_factor = 0.5                                               # Communication Success Rate Distance Factor           (TO DEFINE !!!!) rate / distance
-        self.transmission_time = 0.1                                                                        # Transmission time in seconds                         (TO DEFINE !!!!)
-        self.retransmission_delay = 0.1                                                                     # Retransmission delay in seconds                      (TO DEFINE !!!!)
-        self.computing_time = 0                                                                             # Computing time in seconds for the "router" vehicule  (TO DEFINE !!!!)
+        self.max_range = 1000                                                                               # Max propagation Range in meters
+        self.facteur_attenuation = 2                                                                        # Facteur d'atténuation de la communication = 2 sans obstacle
+        self.distance_de_reference = 100
+        self.Probabilite_de_perte_de_paquet_de_reference = 0.1     
+
+        # SIMULATION
+        Alert_Packet_size = 100*8 # Bits -> BSM (Basic Safety Message)
+        debits = 6 # Mbit/s -> DSRC (Dedicated Short Range Communication)
+
+        CW = 15                                                                                             # Contention Window
+        time_slot = 0.00001                                                                                 # Time slot in seconds
+
+        # Time 
+        self.emmission_time = Alert_Packet_size/debits                                                      # Emission time in seconds                            
+        self.retransmission_delay = CW*time_slot                                                            # Retransmission delay in seconds      
+        self.computing_time = 0.00004                                                                       # Computing time in seconds for the "router" vehicule = SIFS (Short Interframe Space)
 
         # Admitted
         self.propagation_speed = 3 * 10 ** 8                                                                # Propagation speed in meters per second (Propagation speed in the air of an electromagnetic wave (WIFI))
@@ -65,7 +76,7 @@ class V2V:
                 time_delay = (self.space_between_vehicles / self.propagation_speed) + self.computing_time  # Time delay if no packet is lost
                 
                  # if we lose the packet -> we retransmit the packet and we add the retransmission delay
-                while (random.random() > (self.communication_success_rate_distance_factor * (distance_of_communication / self.max_range))):
+                while (random.random() > (1-(1-self.Probabilite_de_perte_de_paquet_de_reference)**((distance_of_communication/self.distance_de_reference)**self.facteur_attenuation))):
                     packet_lost += 1
                     time_delay += (self.space_between_vehicles / self.propagation_speed) + self.retransmission_delay
 
