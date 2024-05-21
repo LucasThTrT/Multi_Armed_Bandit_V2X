@@ -21,7 +21,7 @@ class V2V:
 
         # SIMULATION
         Alert_Packet_size = 100*8 # Bits -> BSM (Basic Safety Message)
-        debits = 6 # Mbit/s -> DSRC (Dedicated Short Range Communication)
+        debits = 5                # Mbit/s -> DSRC (Dedicated Short Range Communication)
 
         CW = 15                                                                                             # Contention Window
         time_slot = 0.00001                                                                                 # Time slot in seconds
@@ -29,7 +29,8 @@ class V2V:
         # Time 
         self.emmission_time = Alert_Packet_size/debits                                                      # Emission time in seconds                            
         self.retransmission_delay = CW*time_slot                                                            # Retransmission delay in seconds      
-        self.computing_time = 0.00004                                                                       # Computing time in seconds for the "router" vehicule = SIFS (Short Interframe Space)
+        self.computing_time = 0.0005 #0.00005                                                               # Computing time in seconds for the "router" vehicule = SIFS (Short Interframe Space)
+        # L'intervalle inter-trame court (short interframe space ou SIFS en anglais), est le temps (en microsecondes) nécessaire à une interface sans-fil pour traiter une trame et répondre avec une trame de réponse.
 
         # Admitted
         self.propagation_speed = 3 * 10 ** 8                                                                # Propagation speed in meters per second (Propagation speed in the air of an electromagnetic wave (WIFI))

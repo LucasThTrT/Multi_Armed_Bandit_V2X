@@ -8,24 +8,24 @@ Pas_distance = 200
 # et qu'elle ne tient pas compte des autres facteurs  comme la congestion du réseau.
 
 
-def calculate_latency_V2I(i):
-    return 0.064*(10,5**-6) * i * Pas_distance
+# def calculate_latency_V2I(i):
+    # return 0.064*(10,5**-6) * i * Pas_distance
 
 # Simulation of V2V communication
 #V2V(distance, traffic_density)
-for i in range(1, 13):
-    V2V_simulation = V2V(Pas_distance * i, 0.05)
+for i in range(15,30):
+    V2V_simulation = V2V(Pas_distance * i, 0.01)
     print("Distance: ", Pas_distance * i)
     print("Traffic density: ", 0.05)
     print("V2V_simulation: ", V2V_simulation.best_transmission)
     print("final latency: ", V2V_simulation.best_transmission)
     print("----------------------")
     print("V2I_simulation: ")
-    print("final latency ", calculate_latency_V2I(i))
+    # print("final latency ", calculate_latency_V2I(i))
     print("---------------------------------------------------")
-    if V2V_simulation.best_transmission[1] < calculate_latency_V2I(i):
-        print("V2V has best latency for distance ", Pas_distance * i, "m")
-    else:
-        print("V2I has best latency for distance ", Pas_distance * i, "m")
+    # if V2V_simulation.best_transmission[1] < calculate_latency_V2I(i):
+    #     print("V2V has best latency for distance ", Pas_distance * i, "m")
+    # else:
+    #     print("V2I has best latency for distance ", Pas_distance * i, "m")
     print("---------------------------------------------------")
 
