@@ -2,7 +2,7 @@
 # The Quality of Service (QoS) will depend on the distance between the transmitter and the receiver and the traffic density in the area
 
 import random
-from Scenario import Scenario
+from Simulation.Version_0.Scenario import Scenario
 
 
 class V2V(Scenario):

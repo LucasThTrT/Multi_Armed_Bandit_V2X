@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 
 # Import des simulations
 from V2V import V2V
+from V2I import V2I
 
-# Define k-stochastic bandit environment
+# On définit l'environnement du bandit - Multi-Armed Bandit (MAB)
 class BanditEnvironment:
     def __init__(self, k):
-        # k: number of bandits
-        self.k = k
-        self.bandits = []
+        # On définit le nombre de bras de la machine
+        self.k = k 
 
         # On enregistre les choix bras de la machine
         # UCB
@@ -20,47 +20,56 @@ class BanditEnvironment:
         self.V2V_Epsilon = 0
         self.V2I_Epsilon = 0
 
-        # On génère les rewards pour chaque bras de la machine
-        # V2V 
-        a = np.random.uniform(0, 1)              # A FAIRE LA SIMU
-        b = np.random.uniform(0, 1)              # A FAIRE LA SIMU
-        self.bandits.append((a, b))
+    
+    # On définit la fonction de récompense
+    def get_reward(self):
+        # on calcule le reward pour chaque bras de la machine
 
+        # Calcul pour chaque itération
+        # V2V
+        V2V_simulation = V2V(800, 0.05)             # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
         # V2I
-        a = np.random.uniform(0, 1)              # A FAIRE LA SIMU
-        b = np.random.uniform(0, 1)              # A FAIRE LA SIMU
-        self.bandits.append((a, b))
+        V2I_simulation = V2I(800, 0.5)              # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
+
+        # On retourne le temps de transmission pour chaque bras de la machine
+        return [V2V_simulation.get_time_delay(), V2I_simulation.latence]
     
-    # Given an arm, return a random reward drawn from the corresponding bandit's distribution
-    def get_reward(self, arm):
-        # arm: index of the bandit to pull
-        # Returns a reward drawn from a uniform distribution with lower bound a and upper bound b
-        a, b = self.bandits[arm]
-        return np.random.uniform(a, b)
-    
+
+# ALGORITHME Epsilon-Greedy
+# Va regarder la récompense moyenne de chaque bras de la machine et va choisir le bras avec la meilleure récompense
 def epsilon_greedy(env, k, T):
-    n = [0] * k # Number of times each arm has been pulled
-    rewards = [0] * k # Cumulative rewards for each arm
-    est_means = [0] * k # Estimated mean reward for each arm
+    n = [0] * k            # nombre de fois que chaque bras de la machine a été tiré
+    rewards = [0] * k      # récompenses cumulées pour chaque bras
+    est_means = [0] * k    # récompense moyenne estimée pour chaque bras
     regrets = []
     for t in range(T):
-        # Calculate exploration rate epsilon for the current time step using the given theorem
+        # On définit le paramètre epsilon pour l'exploration
         with np.errstate(divide='ignore'):
             epsilon = np.power(t, -1/3) * np.power(k * np.log(t), 1/3)
 
-        if np.random.rand() < epsilon:
-            # Choose a random arm with equal probability if the exploration strategy is selected
+        # Exploration-Exploitation Strategy
+        if np.random.rand() < epsilon:          # Lancé de la pièce pour choisir entre exploration et exploitation
+            # EXPLORATION
             arm = np.random.randint(k)
         else:
-            # Choose the arm with the highest estimated mean reward if the exploitation strategy is selected
-            arm = np.argmax(est_means)
-        reward = env.get_reward(arm) # Observe the reward for the chosen arm
-        n[arm] += 1 # Increment the count of times the chosen arm has been pulled
-        rewards[arm] += reward # Add the observed reward to the cumulative rewards for the chosen arm
-        est_means[arm] = rewards[arm] / n[arm] # Update the estimated mean reward for the chosen arm
-        optimal_reward = np.max([env.get_reward(i) for i in range(k)]) # Find the optimal reward among all arms
-        regret = optimal_reward - reward #Calculate regret for the chosen arm
-        regrets.append(regret) #Add the regret to the list of regrets
+            # EXPLOITATION
+            arm = np.argmin(est_means)        # Choisir le bras avec le PLUS PETIT TEMPS DE TRANSMISSION
+
+        # On calcule la récompense pour chaque bras de la machine
+        rewards_iteration = env.get_reward()
+
+        reward = rewards_iteration[arm]        # On récupère le temps de transmission pour le bras choisi
+        n[arm] += 1                            # On incrémente le nombre de fois que le bras choisi a été tiré
+        rewards[arm] += reward                 # On ajoute la récompense observée aux récompenses cumulées pour le bras choisi
+        est_means[arm] = rewards[arm] / n[arm] # On met à jour la récompense moyenne estimée pour le bras choisi
+
+        # On regarde la récompense optimale parmi les 2 bras de la machine
+        # ici on prend le min car on veut minimiser le temps de transmission
+        optimal_reward = np.min([env.get_reward()[i] for i in range(k)])
+        
+        # On calcule le regret de cette itération
+        regret = abs(optimal_reward - reward)
+        regrets.append(regret)
         
         # on enregistre les choix bras de la machine
         if arm == 0:
@@ -68,43 +77,60 @@ def epsilon_greedy(env, k, T):
         else:
             env.V2I_Epsilon += 1
 
-    # on retourne le cumul des regrets
-    return np.cumsum(regrets)
+    # Retourner le cumul des regrets
+    # return np.cumsum(regrets)
+
+    # on retourne la liste des regrets pour chaque itération
+    return regrets
 
 
+# ALGORITHME UCB
+# Va regarder la récompense moyenne de chaque bras de la machine et va choisir le bras avec la meilleure récompense
+# en prenant en compte l'incertitude sur la récompense moyenne
 def ucb(env, k, T):
-    n = [0] * k # Number of times each arm has been pulled
-    rewards = [0] * k # Cumulative rewards for each arm
-    est_means = [0] * k # Estimated mean reward for each arm
+    n = [0] * k             # Nombre de fois que chaque bras de la machine a été tiré
+    rewards = [0] * k       # Récompenses cumulées pour chaque bras
+    est_means = [0] * k     # Récompense moyenne estimée pour chaque bras
     regrets = []
     for t in range(T):
         if t < k:
-            # Play each arm k times to initialize the estimates and UCB values
-            reward = env.get_reward(t)
+            # Jouer chaque bras k fois pour initialiser les estimations et les valeurs UCB
+            reward_iteration = env.get_reward()
+            reward = reward_iteration[t]
             n[t] += 1
             rewards[t] += reward
             est_means[t] = rewards[t] / n[t]
             regrets.append(0)
         else:
-            # Choose the arm with the highest UCB value
-            ucb_values = [est_means[i] + np.sqrt(2*np.log(t) / n[i]) for i in range(k)] # Calculate UCB values for each arm
-            arm = np.argmax(ucb_values) # Select the arm with the highest UCB value
-            reward = env.get_reward(arm) # Observe the reward for the chosen arm
-            n[arm] += 1 # Increment the count of times the chosen arm has been pulled
-            rewards[arm] += reward # Add the observed reward to the cumulative rewards for the chosen arm
-            est_means[arm] = rewards[arm] / n[arm] # Update the estimated mean reward for the chosen arm
-            optimal_reward = np.max([env.get_reward(i) for i in range(k)]) # Find the optimal reward among all arms
-            regret = optimal_reward - reward #Calculate regret for the chosen arm
-            regrets.append(regret) #Add the regret to the list of regrets
+            reward_iteration = env.get_reward()  # Obtenir la récompense pour chaque bras de la machine
 
-            # on enregistre les choix bras de la machine
+            # Choisir le bras avec la plus grande valeur UCB
+            ucb_values = [est_means[i] + np.sqrt(2*np.log(t) / n[i]) for i in range(k)]  # Calculer les valeurs UCB pour chaque bras
+            arm = np.argmin(ucb_values)  # Sélectionner le bras avec la PLUS PETITE VALEUR UCB
+
+            reward = reward_iteration[arm]  # Obtenir la récompense pour le bras choisi
+
+            n[arm] += 1  # Incrémenter le nombre de fois que le bras choisi a été tiré
+            rewards[arm] += reward  # Ajouter la récompense observée aux récompenses cumulées pour le bras choisi
+            est_means[arm] = rewards[arm] / n[arm]  # Mettre à jour la récompense moyenne estimée pour le bras choisi
+
+            optimal_reward = np.min([reward_iteration[i] for i in range(k)])  # Calculer la récompense optimale parmi les bras de la machine
+
+            regret = abs(optimal_reward - reward)  # Calculer le regret pour le bras choisi
+            regrets.append(regret)                 # Ajouter le regret à la liste des regrets
+
+            # Enregistrer les choix de bras de la machine
             if arm == 0:
                 env.V2V_UCB += 1
             else:
                 env.V2I_UCB += 1
 
-    # on retourne le cumul des regrets
-    return np.cumsum(regrets)
+    # Retourner le cumul des regrets
+    # return np.cumsum(regrets)
+
+    # on retourne la liste des regrets pour chaque itération
+    return regrets
+
 
 # Define a function to run the bandit algorithm and plot the results
 def run_bandit(env, k, T):
@@ -129,8 +155,10 @@ def run_bandit(env, k, T):
     plt.xlabel("Time")
     plt.ylabel("Cumulative Regret")
     plt.legend()
+    
     plt.figtext(0.5, 0.05, f"V2V_UCB: {env.V2V_UCB} V2I_UCB: {env.V2I_UCB} \n V2V_Epsilon: {env.V2V_Epsilon} V2I_Epsilon: {env.V2I_Epsilon}", wrap=True, horizontalalignment='center', fontsize=12)
     plt.show()
+
 
 # Define the values of T and k for each environment to be tested
 T_values = [1000, 2000, 30000]
@@ -144,5 +172,3 @@ for i in range(len(T_values)):
     
     # Run the bandit algorithm and plot the results
     run_bandit(env, k, T_values[i])
-
-
