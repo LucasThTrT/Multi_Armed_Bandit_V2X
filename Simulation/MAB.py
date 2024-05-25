@@ -23,16 +23,19 @@ class BanditEnvironment:
     
     # On définit la fonction de récompense
     def get_reward(self):
+        # Distance de la communication qu'on fait varier
+        distance = np.random.randint(500, 3000)
+
         # on calcule le reward pour chaque bras de la machine
 
         # Calcul pour chaque itération
         # V2V
-        V2V_simulation = V2V(800, 0.05)             # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
+        V2V_simulation = V2V(distance, 0.01)             # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
         # Attention pour V2I si on met une distance trop grande distance et un trafic trop élevé, le temps de calcul est bcp bcp trop long donc réduire le trafic
         # Si on met une distance petite et trafic faible il n'y aura pas de voiture -> ERROR
 
         # V2I
-        V2I_simulation = V2I(800, 0.5)              # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
+        V2I_simulation = V2I(distance, 0.5)              # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
 
         # On retourne le temps de transmission pour chaque bras de la machine
         return [V2V_simulation.get_time_delay(), V2I_simulation.latence]
@@ -180,7 +183,8 @@ def run_bandit(env, k, T):
 
 
 # Define the values of T and k for each environment to be tested
-T_values = [1000, 2000, 30000]
+#T_values = [1000, 2000, 10000] # Pour voir l'évolution de la politique de choix de bras de la machine
+T_values = [10000]
 k = 2
 
 # Loop over the different environments and run the bandit algorithm for each

@@ -41,7 +41,7 @@ class V2V:
         self.best_transmission = [False, 0, 0, []]
         self.time_of_simulation = 0
 
-        self.number_of_vehicles = int((self.distance // (self.vehicle_length + self.minimal_space_between_vehicles)) * self.traffic_density)
+        self.number_of_vehicles = int((self.distance // (self.vehicle_length + self.minimal_space_between_vehicles)) * self.traffic_density) + 1
         # print("Number of vehicles: ", self.number_of_vehicles)
 
         # Estimation of the space between vehicles
