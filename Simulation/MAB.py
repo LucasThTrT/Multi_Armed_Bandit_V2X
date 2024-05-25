@@ -28,6 +28,9 @@ class BanditEnvironment:
         # Calcul pour chaque itération
         # V2V
         V2V_simulation = V2V(800, 0.05)             # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
+        # Attention pour V2I si on met une distance trop grande distance et un trafic trop élevé, le temps de calcul est bcp bcp trop long donc réduire le trafic
+        # Si on met une distance petite et trafic faible il n'y aura pas de voiture -> ERROR
+
         # V2I
         V2I_simulation = V2I(800, 0.5)              # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
 
@@ -149,15 +152,31 @@ def run_bandit(env, k, T):
     
     # Plot the cumulative regrets for both algorithms
     # Add a title to the plot indicating the current T and k values
+    plt.figure()
     plt.title(f"T = {T} l'horizon (nb itération), k = 2 BRAS")
-    plt.plot(eps_regrets, label="Epsilon-Greedy")
-    plt.plot(ucb_regrets, label="UCB")
+    plt.plot(np.cumsum(eps_regrets), label="Epsilon-Greedy")
+    plt.plot(np.cumsum(ucb_regrets), label="UCB")
     plt.xlabel("Time")
-    plt.ylabel("Cumulative Regret")
+    plt.ylabel("Cumulate Regret (Time Delay)")
     plt.legend()
-    
-    plt.figtext(0.5, 0.05, f"V2V_UCB: {env.V2V_UCB} V2I_UCB: {env.V2I_UCB} \n V2V_Epsilon: {env.V2V_Epsilon} V2I_Epsilon: {env.V2I_Epsilon}", wrap=True, horizontalalignment='center', fontsize=12)
     plt.show()
+
+
+    # Regret par itération
+    plt.figure()
+    plt.title(f"T = {T} l'horizon (nb itération), k = 2 BRAS")
+    # Tracé des croix pour Epsilon-Greedy
+    plt.scatter(range(len(eps_regrets)), eps_regrets, label="Epsilon-Greedy", marker='x')
+    # Tracé des croix pour UCB
+    plt.scatter(range(len(ucb_regrets)), ucb_regrets, label="UCB", marker='x')
+    plt.xlabel("Time")
+    plt.ylabel("Regret (Time Delay)")
+    plt.legend()
+    # Ajout du texte en bas du graphique
+    plt.figtext(0.5, 0.05, f"V2V_UCB: {env.V2V_UCB} V2I_UCB: {env.V2I_UCB} \n V2V_Epsilon: {env.V2V_Epsilon} V2I_Epsilon: {env.V2I_Epsilon}", wrap=True, horizontalalignment='center', fontsize=12)
+
+    plt.show()
+
 
 
 # Define the values of T and k for each environment to be tested
