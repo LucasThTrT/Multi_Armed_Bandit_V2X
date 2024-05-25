@@ -23,19 +23,42 @@ class BanditEnvironment:
     
     # On définit la fonction de récompense
     def get_reward(self):
+        # ETUDE 1 & 2
+        # On fait peut varier l'environnement on reste dans des conditions "loin" ou "proche" de l'utilisateur
+
+        # ETUDE 3
+        # On commence pendant la moitier de l'itération dans un environnement "loin" et l'autre moitié dans un environnement "prêt"
+        # Pour faire apparaitre le temps de transition entre 2 politiques et les limites à cause de la moyenne
+        # et voir quel algorithme est s'adapte le mieux aux changements d'environnement
+
+        # ETUDE 4
+        # On fait varier complétement alétatoirement les paramètres de la simulation
+        # Comme si on émettait que des messages d'alerte très rarement (donc entre 2 envois on change facilement d'environnement)
+        # Illustre la nullité du MAB dans ce cas
+
+        # REMARQUE 
+        # Je fais varier tout au long la charge et le trafic de manière aléatoire.
+        # On pourra aussi étudier cette impact de fort changement après.
+
         # Distance de la communication qu'on fait varier
-        distance = np.random.randint(500, 3000)
+        distance = np.random.randint(1000, 3000) # loi uniforme entre 1000 et 3000 qui retourne un entier
+
+        # Trafic qu'on fait varier
+        traffic = np.random.uniform(0, 0.005) # loi uniforme entre 0 et 0.10
+        
+        # Charge du réseau V2I qu'on fait varier
+        charge = np.random.uniform(0, 1) # loi uniforme entre 0 et 1
 
         # on calcule le reward pour chaque bras de la machine
 
         # Calcul pour chaque itération
         # V2V
-        V2V_simulation = V2V(distance, 0.01)             # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
+        V2V_simulation = V2V(distance, traffic)             # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
         # Attention pour V2I si on met une distance trop grande distance et un trafic trop élevé, le temps de calcul est bcp bcp trop long donc réduire le trafic
         # Si on met une distance petite et trafic faible il n'y aura pas de voiture -> ERROR
 
         # V2I
-        V2I_simulation = V2I(distance, 0.5)              # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
+        V2I_simulation = V2I(distance, charge)              # PARAMETRES A CHANGER + mettre de l'aleatoire pour varier les résultats
 
         # On retourne le temps de transmission pour chaque bras de la machine
         return [V2V_simulation.get_time_delay(), V2I_simulation.latence]
@@ -155,7 +178,7 @@ def run_bandit(env, k, T):
     
     # Plot the cumulative regrets for both algorithms
     # Add a title to the plot indicating the current T and k values
-    plt.figure()
+    plt.figure(1)
     plt.title(f"T = {T} l'horizon (nb itération) -> Cumule des regrets (Time Delay)")
     plt.plot(np.cumsum(eps_regrets), label="Epsilon-Greedy")
     plt.plot(np.cumsum(ucb_regrets), label="UCB")
@@ -166,7 +189,7 @@ def run_bandit(env, k, T):
 
 
     # Regret par itération
-    plt.figure()
+    plt.figure(2)
     plt.title(f"T = {T} l'horizon (nb itération) -> Regret (Time Delay) par itération")
     # Tracé des croix pour Epsilon-Greedy
     plt.scatter(range(len(eps_regrets)), eps_regrets, label="Epsilon-Greedy", marker='x')
