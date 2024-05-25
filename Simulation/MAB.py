@@ -153,7 +153,7 @@ def run_bandit(env, k, T):
     # Plot the cumulative regrets for both algorithms
     # Add a title to the plot indicating the current T and k values
     plt.figure()
-    plt.title(f"T = {T} l'horizon (nb itération), k = 2 BRAS")
+    plt.title(f"T = {T} l'horizon (nb itération) -> Cumule des regrets (Time Delay)")
     plt.plot(np.cumsum(eps_regrets), label="Epsilon-Greedy")
     plt.plot(np.cumsum(ucb_regrets), label="UCB")
     plt.xlabel("Time")
@@ -164,7 +164,7 @@ def run_bandit(env, k, T):
 
     # Regret par itération
     plt.figure()
-    plt.title(f"T = {T} l'horizon (nb itération), k = 2 BRAS")
+    plt.title(f"T = {T} l'horizon (nb itération) -> Regret (Time Delay) par itération")
     # Tracé des croix pour Epsilon-Greedy
     plt.scatter(range(len(eps_regrets)), eps_regrets, label="Epsilon-Greedy", marker='x')
     # Tracé des croix pour UCB
