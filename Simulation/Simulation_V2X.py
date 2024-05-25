@@ -19,6 +19,7 @@ for i in range(15,30):
     print("Traffic density: ", 0.05)
     print("V2V_simulation: ", V2V_simulation.best_transmission)
     print("final latency: ", V2V_simulation.best_transmission)
+    print("time delay: ", V2V_simulation.get_time_delay())
     print("----------------------")
     print("V2I_simulation: ")
     # print("final latency ", calculate_latency_V2I(i))

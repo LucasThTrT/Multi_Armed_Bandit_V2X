@@ -10,11 +10,26 @@ class BanditEnvironment:
         # k: number of bandits
         self.k = k
         self.bandits = []
-        # For each bandit, generate random reward parameters (a, b) from uniform distributions
-        for i in range(k):
-            a = np.random.uniform(0, 1)
-            b = np.random.uniform(0, 1)
-            self.bandits.append((a, b))
+
+        # On enregistre les choix bras de la machine
+        # UCB
+        self.V2V_UCB = 0
+        self.V2I_UCB = 0
+
+        # Epsilon-Greedy
+        self.V2V_Epsilon = 0
+        self.V2I_Epsilon = 0
+
+        # On génère les rewards pour chaque bras de la machine
+        # V2V 
+        a = np.random.uniform(0, 1)              # A FAIRE LA SIMU
+        b = np.random.uniform(0, 1)              # A FAIRE LA SIMU
+        self.bandits.append((a, b))
+
+        # V2I
+        a = np.random.uniform(0, 1)              # A FAIRE LA SIMU
+        b = np.random.uniform(0, 1)              # A FAIRE LA SIMU
+        self.bandits.append((a, b))
     
     # Given an arm, return a random reward drawn from the corresponding bandit's distribution
     def get_reward(self, arm):
@@ -46,6 +61,14 @@ def epsilon_greedy(env, k, T):
         optimal_reward = np.max([env.get_reward(i) for i in range(k)]) # Find the optimal reward among all arms
         regret = optimal_reward - reward #Calculate regret for the chosen arm
         regrets.append(regret) #Add the regret to the list of regrets
+        
+        # on enregistre les choix bras de la machine
+        if arm == 0:
+            env.V2V_Epsilon += 1
+        else:
+            env.V2I_Epsilon += 1
+
+    # on retourne le cumul des regrets
     return np.cumsum(regrets)
 
 
@@ -73,6 +96,14 @@ def ucb(env, k, T):
             optimal_reward = np.max([env.get_reward(i) for i in range(k)]) # Find the optimal reward among all arms
             regret = optimal_reward - reward #Calculate regret for the chosen arm
             regrets.append(regret) #Add the regret to the list of regrets
+
+            # on enregistre les choix bras de la machine
+            if arm == 0:
+                env.V2V_UCB += 1
+            else:
+                env.V2I_UCB += 1
+
+    # on retourne le cumul des regrets
     return np.cumsum(regrets)
 
 # Define a function to run the bandit algorithm and plot the results
@@ -80,29 +111,38 @@ def run_bandit(env, k, T):
     # Run epsilon-greedy and UCB algorithms and store the cumulative regrets
     eps_regrets = epsilon_greedy(env, k, T)
     ucb_regrets = ucb(env, k, T)
+
+    # On calcule le pourcentage de choix de bras de la machine
+    # UCB
+    env.V2V_UCB = env.V2V_UCB / T
+    env.V2I_UCB = env.V2I_UCB / T
+
+    # Epsilon-Greedy
+    env.V2V_Epsilon = env.V2V_Epsilon / T
+    env.V2I_Epsilon = env.V2I_Epsilon / T
     
     # Plot the cumulative regrets for both algorithms
+    # Add a title to the plot indicating the current T and k values
+    plt.title(f"T = {T} l'horizon (nb itération), k = 2 BRAS")
     plt.plot(eps_regrets, label="Epsilon-Greedy")
     plt.plot(ucb_regrets, label="UCB")
     plt.xlabel("Time")
     plt.ylabel("Cumulative Regret")
     plt.legend()
+    plt.figtext(0.5, 0.05, f"V2V_UCB: {env.V2V_UCB} V2I_UCB: {env.V2I_UCB} \n V2V_Epsilon: {env.V2V_Epsilon} V2I_Epsilon: {env.V2I_Epsilon}", wrap=True, horizontalalignment='center', fontsize=12)
     plt.show()
 
 # Define the values of T and k for each environment to be tested
 T_values = [1000, 2000, 30000]
-k_values = [10, 20, 30]
+k = 2
 
 # Loop over the different environments and run the bandit algorithm for each
 for i in range(len(T_values)):
     print(i)
     # Create a new bandit environment for the current k value
-    env = BanditEnvironment(k_values[i])
-    
-    # Add a title to the plot indicating the current T and k values
-    plt.title(f"T={T_values[i]}, k={k_values[i]}")
+    env = BanditEnvironment(k)
     
     # Run the bandit algorithm and plot the results
-    run_bandit(env, k_values[i], T_values[i])
+    run_bandit(env, k, T_values[i])
 
 

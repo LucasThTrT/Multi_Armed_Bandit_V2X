@@ -147,6 +147,9 @@ class V2V:
         start = time.time()
         self.V2V_simulation(True,0, 0, 0, self.number_of_vehicles, [])
         self.time_of_simulation = time.time() - start
+
+    def get_time_delay(self):
+        return self.best_transmission[1]
     
 
 # Exemple d'utilisation 
