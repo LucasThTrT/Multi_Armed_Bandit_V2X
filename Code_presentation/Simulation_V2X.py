@@ -1,5 +1,5 @@
 import csv
-from Simulation.V2V import V2V
+from V2V import V2V
 from V2I import V2I
 
 Pas_distance = 200
