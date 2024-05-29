@@ -42,7 +42,7 @@ class BanditEnvironment:
 
 
         # Distance de la communication qu'on fait varier
-        distance = np.random.randint(300, 600) # loi uniforme entre 1000 et 3000 qui retourne un entier
+        distance = np.random.randint(1100, 1300) # loi uniforme entre 1000 et 3000 qui retourne un entier
 
         # Trafic qu'on fait varier
         traffic = np.random.uniform(0, 0.005) # loi uniforme entre 0 et 0.10
@@ -84,7 +84,7 @@ class BanditEnvironment:
 
 
         # Distance de la communication qu'on fait varier
-        distance = np.random.randint(1200, 1500) # loi uniforme entre 1000 et 3000 qui retourne un entier
+        distance = np.random.randint(200, 500) # loi uniforme entre 1000 et 3000 qui retourne un entier
 
         # Trafic qu'on fait varier
         traffic = np.random.uniform(0, 0.005) # loi uniforme entre 0 et 0.10
@@ -116,7 +116,7 @@ def epsilon_greedy(env, k, T):
     regrets = []
     total = 0
     for t in range(T):
-        if t < T*0.20 :
+        if t < T*0.10 :
             # On définit le paramètre epsilon pour l'exploration
             with np.errstate(divide='ignore'):
                 epsilon = np.power(t, -1/3) * np.power(k * np.log(t), 1/3)
@@ -203,7 +203,7 @@ def ucb(env, k, T):
     est_means = [0] * k     # Récompense moyenne estimée pour chaque bras
     regrets = []
     for t in range(T):
-        if t < 0.20*T :
+        if t < 0.10*T :
             if t < k:
                 # Jouer chaque bras k fois pour initialiser les estimations et les valeurs UCB
                 reward_iteration = env.get_reward_1()
@@ -216,7 +216,7 @@ def ucb(env, k, T):
                 reward_iteration = env.get_reward_1()  # Obtenir la récompense pour chaque bras de la machine
                 # Choisir le bras avec la plus grande valeur UCB
                 ucb_values = [est_means[i] for i in range(k)]  # Calculer les valeurs UCB pour chaque brass
-                print(ucb_values)
+                # print(ucb_values)
                 arm = np.argmin(ucb_values)  # Sélectionner le bras avec la PLUS PETITE VALEUR UCB
     
                 reward = reward_iteration[arm]/tps_moyen  # Obtenir la récompense pour le bras choisi
@@ -249,7 +249,7 @@ def ucb(env, k, T):
                 reward_iteration = env.get_reward_2()  # Obtenir la récompense pour chaque bras de la machine
                 # Choisir le bras avec la plus grande valeur UCB
                 ucb_values = [est_means[i] for i in range(k)]  # Calculer les valeurs UCB pour chaque brass
-                print(ucb_values)
+                #print(ucb_values)
                 arm = np.argmin(ucb_values)  # Sélectionner le bras avec la PLUS PETITE VALEUR UCB
     
                 reward = reward_iteration[arm]/tps_moyen  # Obtenir la récompense pour le bras choisi

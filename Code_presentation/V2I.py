@@ -55,7 +55,7 @@ class V2I:
         propagation_time = self.distance / self.propagation_speed
 
         # Temps de transmission du message  (APPROXIMATION)
-        a = 0.0001
+        a = 0.0001   
         b = 0.00001
         c = 0.0001
         d = 0.02
